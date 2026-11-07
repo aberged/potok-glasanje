@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* daisyUI components with the `d-` prefix, without themes: the colors come
+   from the potok page's theme (the frame follows its data-theme), and
+   src/dev-theme.css stands in for it in dev. Without the prefix the page's
+   own daisyUI rules would reach the app's elements. */
+@plugin "daisyui" {
+  themes: false;
+  prefix: "d-";
+}
+
+/* The frame loads the page's CSS, which paints the body. The board sits on the
+   background of the group page instead, like a description in text does. */
+html,
+body {
+  background: transparent;
+}
