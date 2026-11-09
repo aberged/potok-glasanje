@@ -55,3 +55,5 @@ Dev mock glasanja čuva u `localStorage` pod `potok-dev:polls`. `openPollForm` d
 ## Licenca
 
 MIT, vidi [LICENSE](LICENSE).
+
+Build nosi i licence koda koji pakuje: pun tekst licence lit-html-a (BSD-3-Clause) na vrhu skripte, a u CSS-u napomene Tailwind CSS-a i daisyUI-ja (MIT).
