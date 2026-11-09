@@ -1,6 +1,6 @@
 # potok glasanje
 
-Tabla glasanja jedne grupe: Potok aplikacija koju donosi šablon **Glasanja** u meniju „Kreiraj podgrupu“. Napravljena je po šablonu [potok-vite](../potok-vite/README.md): Vite, TypeScript, Tailwind, daisyUI sa prefiksom `d-` i lit-html.
+Tabla glasanja jedne grupe: Potok aplikacija koju donosi šablon **Glasanja** u meniju „Kreiraj podgrupu“. Napravljena je po šablonu [potok-vite](https://github.com/aberged/potok-vite/tree/align-alt-descriptions): Vite, TypeScript, Tailwind, daisyUI sa prefiksom `d-` i lit-html.
 
 Glasanja, glasovi i pravila su na serveru, u `PotokIde.Polls`. Isti model čitaju kartica u četu i kartica Glasanja na stranici grupe, a aplikacija je treći prikaz.
 
@@ -51,3 +51,7 @@ U dev režimu jezik se bira sa `?lang=en` ili `?lang=sr-Cyrl`.
 | [src/potok.ts](src/potok.ts), [src/potok-dev.ts](src/potok-dev.ts), [vite.config.ts](vite.config.ts) | iz šablona, bez izmena |
 
 Dev mock glasanja čuva u `localStorage` pod `potok-dev:polls`. `openPollForm` dodaje glasanje, a `openPoll` glasa za prvi odgovor. Za novi početak: `localStorage.removeItem('potok-dev:polls')`.
+
+## Licenca
+
+MIT, vidi [LICENSE](LICENSE).
