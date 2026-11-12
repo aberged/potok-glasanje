@@ -16,6 +16,7 @@ type Ctx = {
   t: Translate;
   lang: string;
   open: (poll: PotokPoll) => void;
+  login: () => void;
 };
 
 function deadline(iso: string, lang: string): string {
@@ -78,6 +79,15 @@ function label(ctx: Ctx, poll: PotokPoll): string | null {
   return poll.public ? ctx.t('public') : null;
 }
 
+// A guest neither votes nor opens a poll on the page: both need an account.
+function guestAction(ctx: Ctx, poll: PotokPoll) {
+  if (!poll.open) return nothing;
+
+  return html`<button type="button" class="d-btn d-btn-sm d-btn-primary" data-login @click=${ctx.login}>
+    ${ctx.t('logInToVote')}
+  </button>`;
+}
+
 function action(ctx: Ctx, poll: PotokPoll) {
   const text = poll.can_vote
     ? ctx.t(poll.voted ? 'changeVote' : 'vote')
@@ -90,7 +100,7 @@ function action(ctx: Ctx, poll: PotokPoll) {
   >${text}</button>`;
 }
 
-function card(ctx: Ctx, poll: PotokPoll) {
+function card(ctx: Ctx, poll: PotokPoll, guest: boolean) {
   const tag = label(ctx, poll);
 
   return html`<article class="d-card bg-base-200">
@@ -106,7 +116,7 @@ function card(ctx: Ctx, poll: PotokPoll) {
         <span>${ctx.t('voted')}: <span class="tabular-nums">${poll.voters_count}</span></span>
         ${poll.open && poll.closes_at ? html`<span>${ctx.t('until')} ${deadline(poll.closes_at, ctx.lang)}</span>` : nothing}
         <span class="flex-1"></span>
-        ${action(ctx, poll)}
+        ${guest ? guestAction(ctx, poll) : action(ctx, poll)}
       </footer>
     </div>
   </article>`;
@@ -124,7 +134,7 @@ function view(board: Board, ctx: Ctx, handlers: { status: (status: Status) => vo
     </header>
 
     <div role="group" class="flex flex-wrap gap-1.5">
-      ${statuses.map(
+      ${statuses.filter(({ status }) => !(board.guest && status === 'waiting')).map(
         ({ status, label: text }) => html`<button
           type="button"
           aria-pressed=${String(board.status === status)}
@@ -145,7 +155,7 @@ function view(board: Board, ctx: Ctx, handlers: { status: (status: Status) => vo
       ? html`<p class="text-sm opacity-70">${ctx.t(emptyTexts[board.status])}</p>`
       : nothing}
 
-    ${repeat(board.polls, (poll) => poll.id, (poll) => card(ctx, poll))}
+    ${repeat(board.polls, (poll) => poll.id, (poll) => card(ctx, poll, board.guest))}
 
     ${board.hasMore
       ? html`<button type="button" class="d-btn d-btn-ghost d-btn-sm self-center" @click=${handlers.more}>${ctx.t('loadMore')}</button>`
@@ -168,6 +178,7 @@ export function mountBoard(root: HTMLElement) {
     t,
     lang,
     open: (poll) => void window.potok.openPoll(poll.id),
+    login: () => void window.potok.openLogin(),
   };
 
   const draw = () => render(view(board, ctx, handlers), root);
@@ -208,6 +219,13 @@ export function mountBoard(root: HTMLElement) {
   void reload();
 
   void window.potok.getGroup().then((reply) => {
-    if (reply.ok) put({ ...board, canStart: reply.group.can_start_polls === true });
+    if (reply.ok) {
+      put({
+        ...board,
+        canStart: reply.group.can_start_polls === true,
+        // A server from before guests says nothing, and that viewer is signed in.
+        guest: reply.group.signed_in === false,
+      });
+    }
   });
 }

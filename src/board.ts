@@ -17,6 +17,8 @@ export type Board = {
   polls: PotokPoll[];
   hasMore: boolean;
   canStart: boolean;
+  /** Someone without an account: they read the public polls and log in to vote. */
+  guest: boolean;
 };
 
 export const emptyBoard = (): Board => ({
@@ -27,6 +29,7 @@ export const emptyBoard = (): Board => ({
   polls: [],
   hasMore: false,
   canStart: false,
+  guest: false,
 });
 
 const isError = (reply: { ok: boolean }): reply is PotokError => !reply.ok;
